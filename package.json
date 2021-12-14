@@ -1,20 +1,25 @@
 {
-  "name": "jie-ws",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "vite": "^2.7.1"
-  },
-  "dependencies": {
-    "ws": "^8.3.0"
-  }
+    "name": "jie-ws",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "type": "module",
+    "files": [
+        "dist",
+        "package.json"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "vite": "^2.7.1"
+    },
+    "dependencies": {
+        "ws": "^8.3.0"
+    }
 }
