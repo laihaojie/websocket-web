@@ -4,23 +4,26 @@ export default class Wss {
     lockReconnect = false
     tt
     // 心跳间隔时间
-    timeout = 60000
+    timeout = 10000
     timeoutObj = null
     serverTimeoutObj = null
     callbackStack = {}
+    url
+    onopen
 
-    constructor() {
+    constructor(url) {
+        this.url = url
         this.createWebSocket()
     }
+    /**
+     *  创建WebSocket实例
+     */
     createWebSocket() {
+        if (!window.WebSocket) {
+            throw Error("您的浏览器不支持WebSocket")
+        }
         try {
-            if ('WebSocket' in window) {
-                this.websocket = new WebSocket("ws://localhost:8120")
-            } else if ('MozWebSocket' in window) {
-                this.websocket = new MozWebSocket("ws://localhost:8120");
-            } else {
-                this.websocket = new SockJS("ws://localhost:8120");
-            }
+            this.websocket = new WebSocket(this.url)
             this.init();
         } catch (e) {
             console.log('catch' + e);
