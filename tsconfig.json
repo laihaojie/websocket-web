@@ -85,5 +85,10 @@
         "dist",
         "tests",
         "/**/*.test.ts"
+    ],
+    "include": [
+
+        "index.ts",
+
     ]
 }

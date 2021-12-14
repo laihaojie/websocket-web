@@ -1,5 +1,5 @@
 export default class Wss {
-    websocket
+    websocket = null
     //避免重复连接
     lockReconnect = false
     tt
@@ -10,6 +10,8 @@ export default class Wss {
     callbackStack = {}
     url
     onopen
+    onerror
+    onclose
 
     constructor(url) {
         this.url = url
@@ -32,7 +34,6 @@ export default class Wss {
     }
     init() {
 
-
         //连接成功建立的回调方法
         this.websocket.onopen = (event) => {
             this.onopen && this.onopen()
@@ -43,24 +44,35 @@ export default class Wss {
         //接收到消息的回调方法
         this.websocket.onmessage = (event) => {
             // console.log("WebSocket:收到一条消息", event.data);
-            const result = JSON.parse(event.data)
-            // 如果指定了action 就出发对应的依赖
-            if (result.action) {
-                this.trigger(result)
+            let result;
+            try {
+                result = JSON.parse(event.data)
+
+                // 如果指定了action 就出发对应的依赖
+                if (result.action) {
+                    this.trigger(result)
+                } else {
+                    this.trigger({ action: 'default', data: result })
+                }
+            } catch (error) {
+                this.trigger({ action: 'default', data: event.data })
+            } finally {
+                this.reset().start();
             }
 
-            this.reset().start();
         };
 
         //连接发生错误的回调方法
         this.websocket.onerror = (event) => {
-            console.log("WebSocket:发生错误");
+            console.log("WebSocket: Error");
+            this.onerror && this.onerror()
             this.reconnect();
         };
 
         //连接关闭的回调方法
         this.websocket.onclose = (event) => {
-            console.log("WebSocket:已关闭");
+            console.log("WebSocket: Closed");
+            this.onclose && this.onclose()
             this.reset(); //心跳检测
             this.reconnect();
         };
@@ -109,7 +121,7 @@ export default class Wss {
         this.lockReconnect = true;
         this.tt && clearTimeout(this.tt);
         this.tt = setTimeout(() => {
-            console.log('重连中...');
+            console.log('reconnect...');
             this.lockReconnect = false;
             this.createWebSocket();
         }, 0);
@@ -128,7 +140,7 @@ export default class Wss {
             this.websocket.send("ping");
             // console.log('ping');
             this.serverTimeoutObj = setTimeout(() => { // 如果超过一定时间还没重置，说明后端主动断开了
-                console.log('关闭服务');
+                console.log('Close Server');
                 this.websocket.close(); //如果onclose会执行reconnect，我们执行 websocket.close()就行了.如果直接执行 reconnect 会触发onclose导致重连两次
             }, this.timeout)
         }, this.timeout)
