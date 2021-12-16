@@ -1,8 +1,9 @@
 import Wss from "/dist/index";
+let obj = {}
 
 
 
-function test() {
+function test(o) {
 
     const ws = new Wss("ws://localhost:8120")
 
@@ -28,8 +29,14 @@ function test() {
 
     ws.onopen = () => {
         console.log("WebSocket:已连接")
+        obj[o] = ws
     }
 
 }
-test()
-test()
+test("a")
+test("b")
+setTimeout(() => {
+    console.log(obj.a === obj.b);
+    obj.a.close()
+    obj.b.close()
+}, 1000);

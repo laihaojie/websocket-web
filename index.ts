@@ -12,6 +12,7 @@ export default class Wss {
     onopen
     onerror
     onclose
+    isClose = false
 
     constructor(url) {
         this.url = url
@@ -74,7 +75,8 @@ export default class Wss {
             console.log("WebSocket: Closed");
             this.onclose && this.onclose()
             this.reset(); //心跳检测
-            this.reconnect();
+            // 判断是否是主动关闭
+            !this.isClose && this.reconnect();
         };
 
         //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
@@ -119,6 +121,7 @@ export default class Wss {
 
         if (this.lockReconnect) return;
         this.lockReconnect = true;
+        this.isClose = false
         this.tt && clearTimeout(this.tt);
         this.tt = setTimeout(() => {
             console.log('reconnect...');
@@ -145,8 +148,11 @@ export default class Wss {
             }, this.timeout)
         }, this.timeout)
     }
-    //关闭连接
-    closeWebSocket() {
+    /**
+     * Close websocket connect
+     */
+    close() {
+        this.isClose = true
         this.websocket.close();
     }
 }
